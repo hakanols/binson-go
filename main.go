@@ -85,9 +85,7 @@ func (b Binson) ToBytes() []byte{
 func StringField(text string) []byte{
     buf := new(bytes.Buffer)
 	buf.WriteByte(STRING1)
-	fmt.Println("Len:", len(text))
-	binary.Write(buf, binary.LittleEndian, len(text))
-	// ToDo Check error
+	binary.Write(buf, binary.LittleEndian, uint8(len(text)))
 	buf.WriteString(text)
     return buf.Bytes()
 }
@@ -95,6 +93,6 @@ func StringField(text string) []byte{
 func IntegerField(value int) []byte{
 	buf := new(bytes.Buffer)
 	buf.WriteByte(INTEGER1)
-	binary.Write(buf, binary.LittleEndian, value)
+	binary.Write(buf, binary.LittleEndian, uint8(value))
     return buf.Bytes()
 }
