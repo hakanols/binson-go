@@ -1,16 +1,9 @@
 package binson
 
-import (  
-    "fmt"
+import (
 	"bytes"
 	"encoding/binary"
 )
-
-func Square(n int) int {
-    return n*n
-}
-
-type FieldTypes byte
 
 const(
 	BEGIN byte = 0x40
@@ -32,67 +25,97 @@ const(
 	BYTES4 = 0x1a
 )
 
-/*
-type field interface {
-    getType() FieldTypes
-    toBytes() float64
-}
-*/
-
-type field struct {  
-    fieldtype string
+type Field interface {
+    toBytes() []byte
 }
 
-func (a field) getType() {  
-    fmt.Sprintf("Hej %s", a.fieldtype)
-}
+type Binson map[binString]Field
+type binArray []Field
+type binInt int
+type binString string
 
-func FunWithMap(){
-    x := make(map[string]int)
-
-    x["b"] = 1
-    x["key"] = 2
-	
-	for key, value := range x {
-		fmt.Println("Key:", key, "Value:", value)
-	}
-}
-
-type Binson struct{
-	objects map[string]int
-}
-
-func New() Binson {  
-    b := Binson{make(map[string]int)}
-    return b
-}
-
-func (b Binson) AddInt(name string, value int) {  
-    b.objects[name] = value
-}
-
-func (b Binson) ToBytes() []byte{
+func (b Binson) toBytes() []byte{
 	var buf bytes.Buffer
 	buf.WriteByte(BEGIN)
-    for name, value := range b.objects {
-	    buf.Write(StringField(name))
-		buf.Write(IntegerField(value))
+    for name, value := range b{
+	    buf.Write(name.toBytes())
+		buf.Write(value.toBytes())
 	}
 	buf.WriteByte(END)
 	return buf.Bytes()
 }
 
-func StringField(text string) []byte{
+func (b binArray) toBytes() []byte{
+	var buf bytes.Buffer
+	buf.WriteByte(BEGIN_ARRAY)
+    for _, field := range b {
+	    buf.Write(field.toBytes())
+	}
+	buf.WriteByte(END_ARRAY)
+	return buf.Bytes()
+}
+
+func (a binInt) toBytes() []byte{  
     buf := new(bytes.Buffer)
-	buf.WriteByte(STRING1)
-	binary.Write(buf, binary.LittleEndian, uint8(len(text)))
-	buf.WriteString(text)
+	buf.WriteByte(INTEGER1)
+	binary.Write(buf, binary.LittleEndian, uint8(a))
     return buf.Bytes()
 }
 
-func IntegerField(value int) []byte{
-	buf := new(bytes.Buffer)
-	buf.WriteByte(INTEGER1)
-	binary.Write(buf, binary.LittleEndian, uint8(value))
+func (a binString) toBytes() []byte{ 
+    buf := new(bytes.Buffer)
+	buf.WriteByte(STRING1)
+	binary.Write(buf, binary.LittleEndian, uint8(len(a)))
+	buf.WriteString(string(a))
     return buf.Bytes()
+}
+
+func NewBinson() Binson {  
+    b := make(map[binString]Field)
+    return b
+}
+
+func (b Binson) putArray(name binString, value binArray) Binson{  
+    b[name] = value
+	return b
+}
+
+func (b Binson) putBinson(name binString, value Binson) Binson{  
+    b[name] = value
+	return b
+}
+
+func (b Binson) putInt(name binString, value binInt) Binson{  
+    b[name] = value
+	return b
+}
+
+func (b Binson) putString(name binString, value binString) Binson{  
+    b[name] = value
+	return b
+}
+
+func NewBinsonArray() binArray {  
+    b := []Field{}
+    return b
+}
+
+func (b binArray) putArray(value binArray) binArray{  
+    b = append(b, value)
+	return b
+}
+
+func (b binArray) putBinson(value Binson) binArray{  
+    b = append(b, value)
+	return b
+}
+
+func (b binArray) putInt(value binInt) binArray{  
+    b = append(b, value)
+	return b
+}
+
+func (b binArray) putString(value binString) binArray{  
+    b = append(b, value)
+	return b
 }

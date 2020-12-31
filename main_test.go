@@ -2,31 +2,36 @@ package binson
 
 import (
     "testing"
+	"encoding/hex"
 )
 
-func TestSquare(t *testing.T) {
-    t.Log(Square(2))
-}
-
-func TestMap(t *testing.T) {
-    FunWithMap()
-	t.Log("Hej")
-}
-
 func TestBinson(t *testing.T) {
-    binson := New()
-	binson.AddInt("Hej", 4)
-	t.Log(binson.ToBytes())
+    binson := NewBinson().
+	    putInt("Hej", 4)
+	t.Log(hex.EncodeToString(binson.toBytes()))
 	
-	binson = New()
-	t.Log(binson.ToBytes())
+	binson = NewBinson()
+	t.Log(hex.EncodeToString(binson.toBytes()))
 	
-	binson = New()
-	binson.AddInt("a", 1)
-	binson.AddInt("b", 2)
-	t.Log(binson.ToBytes())
+	binson = NewBinson().
+	    putInt("a", 1).
+	    putInt("b", 2)
+	t.Log(hex.EncodeToString(binson.toBytes()))
 	
+	binson = NewBinson().
+	    putString("a", "Gris").
+	    putInt("b", 2).
+		putBinson("c", NewBinson().
+	        putString("g", "Hej"))
+	t.Log(hex.EncodeToString(binson.toBytes()))
 	
+	a := NewBinsonArray().
+	    putArray(NewBinsonArray()).
+		putInt(2)
+	binson = NewBinson().
+	    putArray("a", a).
+	    putString("g", "Hej")
+	t.Log(hex.EncodeToString(binson.toBytes()))
 }
 
 
