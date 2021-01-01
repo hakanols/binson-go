@@ -6,32 +6,59 @@ import (
 )
 
 func TestBinson(t *testing.T) {
-    binson := NewBinson().
+    b := NewBinson().
 	    putInt("Hej", 4)
-	t.Log(hex.EncodeToString(binson.toBytes()))
+	t.Log(hex.EncodeToString(b.toBytes()))
 	
-	binson = NewBinson()
-	t.Log(hex.EncodeToString(binson.toBytes()))
+	b = NewBinson()
+	t.Log(hex.EncodeToString(b.toBytes()))
 	
-	binson = NewBinson().
+	b = NewBinson().
 	    putInt("a", 1).
 	    putInt("b", 2)
-	t.Log(hex.EncodeToString(binson.toBytes()))
+	t.Log(hex.EncodeToString(b.toBytes()))
 	
-	binson = NewBinson().
+	b = NewBinson().
 	    putString("a", "Gris").
 	    putInt("b", 2).
 		putBinson("c", NewBinson().
 	        putString("g", "Hej"))
-	t.Log(hex.EncodeToString(binson.toBytes()))
+	t.Log(hex.EncodeToString(b.toBytes()))
+	
+	b = NewBinson().
+	    putArray("a", NewBinsonArray().
+	        putArray(NewBinsonArray()).
+		    putInt(2) ).
+	    putString("g", "Hej")
+	t.Log(hex.EncodeToString(b.toBytes()))
+	
+	b = NewBinson().
+	    putBytes("a",[]byte{1, 2, 3})
+	t.Log(hex.EncodeToString(b.toBytes()))
+	
+	b = NewBinson().
+	    put("a", 4).
+		put("b", "gigi").
+		put("c", NewBinson()).
+		put("d", NewBinsonArray()).
+		put("e", []byte{1, 2, 3})
+	t.Log(hex.EncodeToString(b.toBytes()))
 	
 	a := NewBinsonArray().
-	    putArray(NewBinsonArray()).
-		putInt(2)
-	binson = NewBinson().
-	    putArray("a", a).
-	    putString("g", "Hej")
-	t.Log(hex.EncodeToString(binson.toBytes()))
+	    putInt(4).
+		putString("gigi").
+		putBinson(NewBinson()).
+		putArray(NewBinsonArray()).
+		putBytes([]byte{1, 2, 3})
+	t.Log(hex.EncodeToString(a.toBytes()))
+
+	a = NewBinsonArray().
+	    put(4).
+		put("gigi").
+		put(NewBinson()).
+		put(NewBinsonArray()).
+		put([]byte{1, 2, 3})
+	t.Log(hex.EncodeToString(a.toBytes()))
 }
 
 

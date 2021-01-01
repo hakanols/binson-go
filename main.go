@@ -3,6 +3,7 @@ package binson
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 )
 
 const(
@@ -30,9 +31,10 @@ type Field interface {
 }
 
 type Binson map[binString]Field
-type binArray []Field
+type BinsonArray []Field
 type binInt int
 type binString string
+type binBytes []byte
 
 func (b Binson) toBytes() []byte{
 	var buf bytes.Buffer
@@ -45,7 +47,7 @@ func (b Binson) toBytes() []byte{
 	return buf.Bytes()
 }
 
-func (b binArray) toBytes() []byte{
+func (b BinsonArray) toBytes() []byte{
 	var buf bytes.Buffer
 	buf.WriteByte(BEGIN_ARRAY)
     for _, field := range b {
@@ -70,17 +72,25 @@ func (a binString) toBytes() []byte{
     return buf.Bytes()
 }
 
+func (a binBytes) toBytes() []byte{ 
+    buf := new(bytes.Buffer)
+	buf.WriteByte(BYTES1)
+	binary.Write(buf, binary.LittleEndian, uint8(len(a)))
+	buf.Write(a)
+    return buf.Bytes()
+}
+
 func NewBinson() Binson {  
     b := make(map[binString]Field)
     return b
 }
 
-func (b Binson) putArray(name binString, value binArray) Binson{  
+func (b Binson) putBinson(name binString, value Binson) Binson{  
     b[name] = value
 	return b
 }
 
-func (b Binson) putBinson(name binString, value Binson) Binson{  
+func (b Binson) putArray(name binString, value BinsonArray) Binson{  
     b[name] = value
 	return b
 }
@@ -95,27 +105,73 @@ func (b Binson) putString(name binString, value binString) Binson{
 	return b
 }
 
-func NewBinsonArray() binArray {  
-    b := []Field{}
-    return b
-}
-
-func (b binArray) putArray(value binArray) binArray{  
-    b = append(b, value)
+func (b Binson) putBytes(name binString, value binBytes) Binson{  
+    b[name] = value
 	return b
 }
 
-func (b binArray) putBinson(value Binson) binArray{  
-    b = append(b, value)
+func (b Binson) put(name binString, value interface{}) (Binson){
+    switch o := value.(type) {
+        case Binson:
+            b.putBinson(name, o)
+        case BinsonArray:
+            b.putArray(name, o)
+        case int:
+            b.putInt(name, binInt(o))
+		case string:
+            b.putString(name, binString(o))
+		case []byte:
+            b.putBytes(name, binBytes(o))
+        default: 
+            panic(fmt.Sprintf("%T is not handeled by Binson", o))
+    }
 	return b
 }
 
-func (b binArray) putInt(value binInt) binArray{  
-    b = append(b, value)
-	return b
+func NewBinsonArray() BinsonArray {  
+    a := []Field{}
+    return a
 }
 
-func (b binArray) putString(value binString) binArray{  
-    b = append(b, value)
-	return b
+func (a BinsonArray) putArray(value BinsonArray) BinsonArray{  
+    a = append(a, value)
+	return a
+}
+
+func (a BinsonArray) putBinson(value Binson) BinsonArray{  
+    a = append(a, value)
+	return a
+}
+
+func (a BinsonArray) putInt(value binInt) BinsonArray{  
+    a = append(a, value)
+	return a
+}
+
+func (a BinsonArray) putString(value binString) BinsonArray{  
+    a = append(a, value)
+	return a
+}
+
+func (a BinsonArray) putBytes(value binBytes) BinsonArray{  
+    a = append(a, value)
+	return a
+}
+
+func (a BinsonArray) put(value interface{}) (BinsonArray){
+    switch o := value.(type) {
+        case Binson:
+            a = a.putBinson(o)
+        case BinsonArray:
+            a = a.putArray(o)
+        case int:
+            a = a.putInt(binInt(o))
+		case string:
+            a = a.putString(binString(o))
+		case []byte:
+            a = a.putBytes(binBytes(o))
+        default: 
+            panic(fmt.Sprintf("%T is not handeled by Binson", o))
+    }
+	return a
 }
