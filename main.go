@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"sort"
 )
 
 const(
@@ -35,13 +36,19 @@ type BinsonArray []Field
 type BinsonInt int
 type BinsonString string
 type BinsonBytes []byte
+type BinsonBool bool
 
 func (b Binson) ToBytes() []byte{
 	var buf bytes.Buffer
 	buf.WriteByte(BEGIN)
-    for name, value := range b{
-	    buf.Write(name.ToBytes())
-		buf.Write(value.ToBytes())
+	keys := make([]string, 0, len(b))
+    for k := range b {
+        keys = append(keys, string(k))
+    }
+	sort.Strings(keys)
+    for _, key := range keys{
+	    buf.Write(BinsonString(key).ToBytes())
+		buf.Write(b[BinsonString(key)].ToBytes())
 	}
 	buf.WriteByte(END)
 	return buf.Bytes()
@@ -80,6 +87,14 @@ func (a BinsonBytes) ToBytes() []byte{
     return buf.Bytes()
 }
 
+func (a BinsonBool) ToBytes() []byte{
+    if a {
+		return []byte{TRUE}
+	} else {
+	    return []byte{FALSE}
+	}
+}
+
 func NewBinson() Binson {  
     b := make(map[BinsonString]Field)
     return b
@@ -110,6 +125,11 @@ func (b Binson) PutBytes(name BinsonString, value BinsonBytes) Binson{
 	return b
 }
 
+func (b Binson) PutBool(name BinsonString, value BinsonBool) Binson{  
+    b[name] = value
+	return b
+}
+
 func (b Binson) Put(name BinsonString, value interface{}) (Binson){
     switch o := value.(type) {
         case Binson:
@@ -122,6 +142,8 @@ func (b Binson) Put(name BinsonString, value interface{}) (Binson){
             b.PutString(name, BinsonString(o))
 		case []byte:
             b.PutBytes(name, BinsonBytes(o))
+		case bool:
+            b.PutBool(name, BinsonBool(o))
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }
@@ -158,6 +180,11 @@ func (a BinsonArray) PutBytes(value BinsonBytes) BinsonArray{
 	return a
 }
 
+func (a BinsonArray) PutBool(value BinsonBool) BinsonArray{  
+    a = append(a, value)
+	return a
+}
+
 func (a BinsonArray) Put(value interface{}) (BinsonArray){
     switch o := value.(type) {
         case Binson:
@@ -170,6 +197,8 @@ func (a BinsonArray) Put(value interface{}) (BinsonArray){
             a = a.PutString(BinsonString(o))
 		case []byte:
             a = a.PutBytes(BinsonBytes(o))
+		case bool:
+            a = a.PutBool(BinsonBool(o))
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }

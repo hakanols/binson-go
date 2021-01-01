@@ -6,30 +6,26 @@ import (
 )
 
 func TestBinson(t *testing.T) {
-    b := NewBinson().
-	    PutInt("Hej", 4)
+    b := NewBinson()
 	t.Log(hex.EncodeToString(b.ToBytes()))
-	
-	b = NewBinson()
-	t.Log(hex.EncodeToString(b.ToBytes()))
-	
-	b = NewBinson().
-	    PutInt("a", 1).
-	    PutInt("b", 2)
+
+    b = NewBinson().
+	    PutInt("a", 4)
 	t.Log(hex.EncodeToString(b.ToBytes()))
 	
 	b = NewBinson().
-	    PutString("a", "Gris").
-	    PutInt("b", 2).
-		PutBinson("c", NewBinson().
-	        PutString("g", "Hej"))
+	    PutString("b", "Gris")
+	t.Log(hex.EncodeToString(b.ToBytes()))
+	
+	b = NewBinson().
+	    PutBinson("c", NewBinson().
+	        PutString("d", "Hej"))
 	t.Log(hex.EncodeToString(b.ToBytes()))
 	
 	b = NewBinson().
 	    PutArray("a", NewBinsonArray().
 	        PutArray(NewBinsonArray()).
-		    PutInt(2) ).
-	    PutString("g", "Hej")
+		    PutInt(2) )
 	t.Log(hex.EncodeToString(b.ToBytes()))
 	
 	b = NewBinson().
@@ -37,11 +33,26 @@ func TestBinson(t *testing.T) {
 	t.Log(hex.EncodeToString(b.ToBytes()))
 	
 	b = NewBinson().
+	    PutBool("a",true).
+		PutBool("b",false)
+	t.Log(hex.EncodeToString(b.ToBytes()))
+	
+	b = NewBinson().
+	    PutInt("a", 4).
+		PutString("b", "gigi").
+		PutBinson("c", NewBinson()).
+		PutArray("d", NewBinsonArray()).
+		PutBytes("e", []byte{1, 2, 3}).
+		PutBool("f", true)
+	t.Log(hex.EncodeToString(b.ToBytes()))
+	
+	b = NewBinson().
 	    Put("a", 4).
 		Put("b", "gigi").
 		Put("c", NewBinson()).
 		Put("d", NewBinsonArray()).
-		Put("e", []byte{1, 2, 3})
+		Put("e", []byte{1, 2, 3}).
+		Put("f", true)
 	t.Log(hex.EncodeToString(b.ToBytes()))
 	
 	a := NewBinsonArray().
@@ -49,7 +60,8 @@ func TestBinson(t *testing.T) {
 		PutString("gigi").
 		PutBinson(NewBinson()).
 		PutArray(NewBinsonArray()).
-		PutBytes([]byte{1, 2, 3})
+		PutBytes([]byte{1, 2, 3}).
+		PutBool(false)
 	t.Log(hex.EncodeToString(a.ToBytes()))
 
 	a = NewBinsonArray().
@@ -57,7 +69,8 @@ func TestBinson(t *testing.T) {
 		Put("gigi").
 		Put(NewBinson()).
 		Put(NewBinsonArray()).
-		Put([]byte{1, 2, 3})
+		Put([]byte{1, 2, 3}).
+		Put(false)
 	t.Log(hex.EncodeToString(a.ToBytes()))
 }
 
