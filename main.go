@@ -41,12 +41,7 @@ type BinsonBool bool
 func (b Binson) ToBytes() []byte{
 	var buf bytes.Buffer
 	buf.WriteByte(BEGIN)
-	keys := make([]string, 0, len(b))
-    for k := range b {
-        keys = append(keys, string(k))
-    }
-	sort.Strings(keys)
-    for _, key := range keys{
+    for _, key := range b.FieldNames(){
 	    buf.Write(BinsonString(key).ToBytes())
 		buf.Write(b[BinsonString(key)].ToBytes())
 	}
@@ -98,6 +93,24 @@ func (a BinsonBool) ToBytes() []byte{
 func NewBinson() Binson {  
     b := make(map[BinsonString]Field)
     return b
+}
+
+func (b Binson) FieldNames() []string{
+	keys := make([]string, 0, len(b))
+    for k := range b {
+        keys = append(keys, string(k))
+    }
+	sort.Strings(keys)
+    return keys;
+}
+
+func (b Binson) ContainsKey(name string) bool{
+    _, ok := b[BinsonString(name)]
+    return ok
+}
+
+func (b Binson) Remove(name string) {
+    delete(b, BinsonString(name))
 }
 
 func (b Binson) PutBinson(name BinsonString, value Binson) Binson{  
