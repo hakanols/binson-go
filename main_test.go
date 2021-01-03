@@ -45,23 +45,29 @@ func TestBinson(t *testing.T) {
     
     want, _ = hex.DecodeString("40140161180301020341")
     b = NewBinson().
-        PutBytes("a",[]byte{1, 2, 3})
+        PutBytes("a", []byte{1, 2, 3})
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
     
     want, _ = hex.DecodeString("40140161441401624541")
     b = NewBinson().
-        PutBool("a",true).
-        PutBool("b",false)
+        PutBool("a", true).
+        PutBool("b", false)
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
+	
+	want, _ = hex.DecodeString("4014016146e17a14ae4701374041")
+    b = NewBinson().
+        PutFloat("a", 23.005)
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 
-    want, _ = hex.DecodeString("4014016110041401621404676967691401634041140164424314016518030102031401664441")
+    want, _ = hex.DecodeString("401401611004140162140467696769140163404114016442431401651803010203140166441401674614ae47e17a543e4041")
     b = NewBinson().
         PutInt("a", 4).
         PutString("b", "gigi").
         PutBinson("c", NewBinson()).
         PutArray("d", NewBinsonArray()).
         PutBytes("e", []byte{1, 2, 3}).
-        PutBool("f", true)
+        PutBool("f", true).
+		PutFloat("g", 30.33)
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
     
     b = NewBinson().
@@ -70,17 +76,19 @@ func TestBinson(t *testing.T) {
         Put("c", NewBinson()).
         Put("d", NewBinsonArray()).
         Put("e", []byte{1, 2, 3}).
-        Put("f", true)
+        Put("f", true).
+		Put("g", 30.33)
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
     
-    want, _ = hex.DecodeString("4210041404676967694041424318030102034543")
+    want, _ = hex.DecodeString("421004140467696769404142431803010203454614ae47e17a543e4043")
     a := NewBinsonArray().
         PutInt(4).
         PutString("gigi").
         PutBinson(NewBinson()).
         PutArray(NewBinsonArray()).
         PutBytes([]byte{1, 2, 3}).
-        PutBool(false)
+        PutBool(false).
+		PutFloat(30.33)
     assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
 
     a = NewBinsonArray().
@@ -89,7 +97,8 @@ func TestBinson(t *testing.T) {
         Put(NewBinson()).
         Put(NewBinsonArray()).
         Put([]byte{1, 2, 3}).
-        Put(false)
+        Put(false).
+		Put(30.33)
     assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
 
     b = NewBinson().

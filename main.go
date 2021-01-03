@@ -37,6 +37,7 @@ type BinsonInt int
 type BinsonString string
 type BinsonBytes []byte
 type BinsonBool bool
+type BinsonFloat float64
 
 func (b Binson) ToBytes() []byte {
     var buf bytes.Buffer
@@ -88,6 +89,13 @@ func (a BinsonBool) ToBytes() []byte {
     } else {
         return []byte{FALSE}
     }
+}
+
+func (a BinsonFloat) ToBytes() []byte {
+    buf := new(bytes.Buffer)
+    buf.WriteByte(DOUBLE)
+    binary.Write(buf, binary.LittleEndian, float64(a))
+    return buf.Bytes()
 }
 
 func NewBinson() Binson {
@@ -143,6 +151,11 @@ func (b Binson) PutBool(name BinsonString, value BinsonBool) Binson {
     return b
 }
 
+func (b Binson) PutFloat(name BinsonString, value BinsonFloat) Binson {
+    b[name] = value
+    return b
+}
+
 func (b Binson) Put(name BinsonString, value interface{}) (Binson) {
     switch o := value.(type) {
         case Binson:
@@ -157,6 +170,8 @@ func (b Binson) Put(name BinsonString, value interface{}) (Binson) {
             b.PutBytes(name, BinsonBytes(o))
         case bool:
             b.PutBool(name, BinsonBool(o))
+		case float64:
+            b.PutFloat(name, BinsonFloat(o))
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }
@@ -205,6 +220,11 @@ func (a BinsonArray) PutBool(value BinsonBool) BinsonArray{
     return a
 }
 
+func (a BinsonArray) PutFloat(value BinsonFloat) BinsonArray {
+    *(a.list) = append(*(a.list), value)
+    return a
+}
+
 func (a BinsonArray) Put(value interface{}) (BinsonArray){
     switch o := value.(type) {
         case Binson:
@@ -219,6 +239,8 @@ func (a BinsonArray) Put(value interface{}) (BinsonArray){
             a.PutBytes(BinsonBytes(o))
         case bool:
             a.PutBool(BinsonBool(o))
+        case float64:
+            a.PutFloat(BinsonFloat(o))
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }
