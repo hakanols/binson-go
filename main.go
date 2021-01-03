@@ -5,6 +5,7 @@ import (
     "encoding/binary"
     "fmt"
     "sort"
+	"math"
 )
 
 const(
@@ -33,11 +34,25 @@ type Field interface {
 
 type Binson map[BinsonString]Field
 type BinsonArray struct { list *[]Field }
-type BinsonInt int
+type BinsonInt int64
 type BinsonString string
 type BinsonBytes []byte
 type BinsonBool bool
 type BinsonFloat float64
+
+func PackInteger(value int64) []byte{
+    buf := new(bytes.Buffer)
+	if math.MinInt8 <= value && value <= math.MaxInt8 {
+        binary.Write(buf, binary.LittleEndian, int8(value))
+	} else if math.MinInt16 <= value && value <= math.MaxInt16 {
+        binary.Write(buf, binary.LittleEndian, int16(value))
+	} else if math.MinInt32 <= value && value <= math.MaxInt32 {
+        binary.Write(buf, binary.LittleEndian, int32(value))
+	} else {
+        binary.Write(buf, binary.LittleEndian, value)
+	}
+    return buf.Bytes()
+}
 
 func (b Binson) ToBytes() []byte {
     var buf bytes.Buffer
@@ -62,23 +77,55 @@ func (b BinsonArray) ToBytes() []byte {
 
 func (a BinsonInt) ToBytes() []byte {
     buf := new(bytes.Buffer)
-    buf.WriteByte(INTEGER1)
-    binary.Write(buf, binary.LittleEndian, uint8(a))
+	packedInt := PackInteger(int64(a))
+	switch len(packedInt) {
+        case 1:
+            buf.WriteByte(INTEGER1)
+        case 2:
+            buf.WriteByte(INTEGER2)
+        case 4:
+            buf.WriteByte(INTEGER4)
+        case 8:
+            buf.WriteByte(INTEGER8)
+        default: 
+            panic(fmt.Sprintf("Can not handle byte array of size %d", len(packedInt)))
+    }
+    buf.Write(packedInt)
     return buf.Bytes()
 }
 
 func (a BinsonString) ToBytes() []byte {
     buf := new(bytes.Buffer)
-    buf.WriteByte(STRING1)
-    binary.Write(buf, binary.LittleEndian, uint8(len(a)))
+	lengtBytes := PackInteger(int64(len(a)))
+	switch len(lengtBytes) {
+        case 1:
+            buf.WriteByte(STRING1)
+        case 2:
+            buf.WriteByte(STRING2)
+        case 4:
+            buf.WriteByte(STRING4)
+        default: 
+            panic(fmt.Sprintf("Can not handle byte array of size %d", len(lengtBytes)))
+    }
+    buf.Write(lengtBytes)
     buf.WriteString(string(a))
     return buf.Bytes()
 }
 
 func (a BinsonBytes) ToBytes() []byte {
     buf := new(bytes.Buffer)
-    buf.WriteByte(BYTES1)
-    binary.Write(buf, binary.LittleEndian, uint8(len(a)))
+	lengtBytes := PackInteger(int64(len(a)))
+	switch len(lengtBytes) {
+        case 1:
+            buf.WriteByte(BYTES1)
+        case 2:
+            buf.WriteByte(BYTES2)
+        case 4:
+            buf.WriteByte(BYTES4)
+        default: 
+            panic(fmt.Sprintf("Can not handle byte array of size %d", len(lengtBytes)))
+    }
+    buf.Write(lengtBytes)
     buf.Write(a)
     return buf.Bytes()
 }
