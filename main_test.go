@@ -2,107 +2,119 @@ package binson
 
 import (
     "testing"
-	"reflect"
-	"encoding/hex"
-	"github.com/stretchr/testify/assert"
+    "reflect"
+    "encoding/hex"
+    "github.com/stretchr/testify/assert"
 )
 
 func ByteEqual(t *testing.T, got []byte, wantString string){
-	want, err := hex.DecodeString(wantString)
+    want, err := hex.DecodeString(wantString)
     //if err != nil || bytes.Compare(got, want) != 0 {
-	if err != nil || !reflect.DeepEqual(got, want){
+    if err != nil || !reflect.DeepEqual(got, want){
         t.Errorf("Failed\nGot:  %s\nWant: %s", hex.EncodeToString(got), wantString)
     }
 }
 
 func TestBinson(t *testing.T) {
-	want, _ := hex.DecodeString("4041")
+    want, _ := hex.DecodeString("4041")
     b := NewBinson()
-    assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 
     want, _ = hex.DecodeString("40140161100441")
     b = NewBinson().
-	    PutInt("a", 4)
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
+        PutInt("a", 4)
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 
-	want, _ = hex.DecodeString("4014016214044772697341")
-	b = NewBinson().
-	    PutString("b", "Gris")
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
-	
-	want, _ = hex.DecodeString("4014016340140164140348656a4141")
-	b = NewBinson().
-	    PutBinson("c", NewBinson().
-	        PutString("d", "Hej"))
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
-	
-	want, _ = hex.DecodeString("4014016142424310024341")
-	b = NewBinson().
-	    PutArray("a", NewBinsonArray().
-	        PutArray(NewBinsonArray()).
-		    PutInt(2) )
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
-	
-	want, _ = hex.DecodeString("40140161180301020341")
-	b = NewBinson().
-	    PutBytes("a",[]byte{1, 2, 3})
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
-	
-	want, _ = hex.DecodeString("40140161441401624541")
-	b = NewBinson().
-	    PutBool("a",true).
-		PutBool("b",false)
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
+    want, _ = hex.DecodeString("4014016214044772697341")
+    b = NewBinson().
+        PutString("b", "Gris")
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
+    
+    want, _ = hex.DecodeString("4014016340140164140348656a4141")
+    b = NewBinson().
+        PutBinson("c", NewBinson().
+            PutString("d", "Hej"))
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
+    
+    want, _ = hex.DecodeString("4014016142424310024341")
+    b = NewBinson().
+        PutArray("a", NewBinsonArray().
+            PutArray(NewBinsonArray()).
+            PutInt(2) )
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
+    
+    want, _ = hex.DecodeString("40140161180301020341")
+    b = NewBinson().
+        PutBytes("a",[]byte{1, 2, 3})
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
+    
+    want, _ = hex.DecodeString("40140161441401624541")
+    b = NewBinson().
+        PutBool("a",true).
+        PutBool("b",false)
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 
-	want, _ = hex.DecodeString("4014016110041401621404676967691401634041140164424314016518030102031401664441")
-	b = NewBinson().
-	    PutInt("a", 4).
-		PutString("b", "gigi").
-		PutBinson("c", NewBinson()).
-		PutArray("d", NewBinsonArray()).
-		PutBytes("e", []byte{1, 2, 3}).
-		PutBool("f", true)
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
-	
-	b = NewBinson().
-	    Put("a", 4).
-		Put("b", "gigi").
-		Put("c", NewBinson()).
-		Put("d", NewBinsonArray()).
-		Put("e", []byte{1, 2, 3}).
-		Put("f", true)
-	assert.Equal(t, b.ToBytes(), want, "Bytes do not match")
-	
-	want, _ = hex.DecodeString("4210041404676967694041424318030102034543")
-	a := NewBinsonArray().
-	    PutInt(4).
-		PutString("gigi").
-		PutBinson(NewBinson()).
-		PutArray(NewBinsonArray()).
-		PutBytes([]byte{1, 2, 3}).
-		PutBool(false)
-	assert.Equal(t, a.ToBytes(), want, "Bytes do not match")
+    want, _ = hex.DecodeString("4014016110041401621404676967691401634041140164424314016518030102031401664441")
+    b = NewBinson().
+        PutInt("a", 4).
+        PutString("b", "gigi").
+        PutBinson("c", NewBinson()).
+        PutArray("d", NewBinsonArray()).
+        PutBytes("e", []byte{1, 2, 3}).
+        PutBool("f", true)
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
+    
+    b = NewBinson().
+        Put("a", 4).
+        Put("b", "gigi").
+        Put("c", NewBinson()).
+        Put("d", NewBinsonArray()).
+        Put("e", []byte{1, 2, 3}).
+        Put("f", true)
+    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
+    
+    want, _ = hex.DecodeString("4210041404676967694041424318030102034543")
+    a := NewBinsonArray().
+        PutInt(4).
+        PutString("gigi").
+        PutBinson(NewBinson()).
+        PutArray(NewBinsonArray()).
+        PutBytes([]byte{1, 2, 3}).
+        PutBool(false)
+    assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
 
-	a = NewBinsonArray().
-	    Put(4).
-		Put("gigi").
-		Put(NewBinson()).
-		Put(NewBinsonArray()).
-		Put([]byte{1, 2, 3}).
-		Put(false)
-	assert.Equal(t, a.ToBytes(), want, "Bytes do not match")
+    a = NewBinsonArray().
+        Put(4).
+        Put("gigi").
+        Put(NewBinson()).
+        Put(NewBinsonArray()).
+        Put([]byte{1, 2, 3}).
+        Put(false)
+    assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
 
-	b = NewBinson().
-	    Put("a","g").
-		Put("b","h")
-    assert.Equal(t, b.FieldNames(), []string{"a", "b"}, "Keys do not match")	
-	assert.True(t, b.ContainsKey("a"), "Key do not exist")
-	assert.True(t, b.ContainsKey("b"), "Key do not exist")
-	assert.False(t, b.ContainsKey("c"), "Key should not exist")
-	b.Remove("a")
-	assert.Equal(t, b.FieldNames(), []string{"b"}, "Keys do not match")
-	assert.False(t, b.ContainsKey("a"), "Key should not exist")
-	assert.True(t, b.ContainsKey("b"), "Key do not exist")
+    b = NewBinson().
+        Put("a","g").
+        Put("b","h")
+    assert.Equal(t, b.FieldNames(), []string{"a", "b"}, "Keys do not match")    
+    assert.True(t, b.ContainsKey("a"), "Key do not exist")
+    assert.True(t, b.ContainsKey("b"), "Key do not exist")
+    assert.False(t, b.ContainsKey("c"), "Key should not exist")
+    b.Remove("a")
+    assert.Equal(t, b.FieldNames(), []string{"b"}, "Keys do not match")
+    assert.False(t, b.ContainsKey("a"), "Key should not exist")
+    assert.True(t, b.ContainsKey("b"), "Key do not exist")
+    
+    a = NewBinsonArray().
+        Put("a").
+        Put("b").
+        Put("c")
+    assert.Equal(t, 3, a.Size(), "Wrong length")
+    want, _ = hex.DecodeString("4214016114016214016343")
+    assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
+    a.Remove(1)
+    assert.Equal(t, 2, a.Size(), "Wrong length")
+    want, _ = hex.DecodeString("4214016114016343")
+    assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
 }
 
 
