@@ -33,7 +33,7 @@ type Field interface {
 }
 
 type Binson map[BinsonString]Field
-type BinsonArray struct { list *[]Field }
+type BinsonArray []Field
 type BinsonInt int64
 type BinsonString string
 type BinsonBytes []byte
@@ -65,10 +65,10 @@ func (b Binson) ToBytes() []byte {
     return buf.Bytes()
 }
 
-func (b BinsonArray) ToBytes() []byte {
+func (b *BinsonArray) ToBytes() []byte {
     var buf bytes.Buffer
     buf.WriteByte(BEGIN_ARRAY)
-    for _, field := range *(b.list) {
+    for _, field := range *b {
         buf.Write(field.ToBytes())
     }
     buf.WriteByte(END_ARRAY)
@@ -145,6 +145,16 @@ func (a BinsonFloat) ToBytes() []byte {
     return buf.Bytes()
 }
 
+/*
+func ParseField(buf *Buffer) Field, string {
+    
+}
+
+func Parse(bytes []byte) Binson, err{
+    buf := NewBuffer(bytes []byte)
+    buf.WriteByte
+}*/
+
 func NewBinson() Binson {
     b := make(map[BinsonString]Field)
     return b
@@ -173,7 +183,7 @@ func (b Binson) PutBinson(name BinsonString, value Binson) Binson {
     return b
 }
 
-func (b Binson) PutArray(name BinsonString, value BinsonArray) Binson {
+func (b Binson) PutArray(name BinsonString, value *BinsonArray) Binson {
     b[name] = value
     return b
 }
@@ -207,7 +217,7 @@ func (b Binson) Put(name BinsonString, value interface{}) (Binson) {
     switch o := value.(type) {
         case Binson:
             b.PutBinson(name, o)
-        case BinsonArray:
+        case *BinsonArray:
             b.PutArray(name, o)
         case int:
             b.PutInt(name, BinsonInt(o))
@@ -225,58 +235,59 @@ func (b Binson) Put(name BinsonString, value interface{}) (Binson) {
     return b
 }
 
-func NewBinsonArray() BinsonArray {
-    return BinsonArray{ list: &([]Field{}) }
+func NewBinsonArray() *BinsonArray {
+    a := BinsonArray([]Field{})
+    return &a
 }
 
-func (a BinsonArray) Size() int{
-    return len(*(a.list));
+func (a *BinsonArray) Size() int{
+    return len(*a);
 }
 
-func (a BinsonArray) Remove(index int){
-    *(a.list) = append( (*(a.list))[:index], (*(a.list))[index+1:]...)
+func (a *BinsonArray) Remove(index int){
+    *a = append( (*a)[:index], (*a)[index+1:]...)
 }
 
-func (a BinsonArray) PutArray(value BinsonArray) BinsonArray {
-    *(a.list) = append(*(a.list), value)
+func (a *BinsonArray) PutArray(value *BinsonArray) *BinsonArray {
+    *a = append(*a, value)
     return a
 }
 
-func (a BinsonArray) PutBinson(value Binson) BinsonArray {
-    *(a.list) = append(*(a.list), value)
+func (a *BinsonArray) PutBinson(value Binson) *BinsonArray {
+    *a = append(*a, value)
     return a
 }
 
-func (a BinsonArray) PutInt(value BinsonInt) BinsonArray{  
-    *(a.list) = append(*(a.list), value)
+func (a *BinsonArray) PutInt(value BinsonInt) *BinsonArray{  
+    *a = append(*a, value)
     return a
 }
 
-func (a BinsonArray) PutString(value BinsonString) BinsonArray{  
-    *(a.list) = append(*(a.list), value)
+func (a *BinsonArray) PutString(value BinsonString) *BinsonArray{  
+    *a = append(*a, value)
     return a
 }
 
-func (a BinsonArray) PutBytes(value BinsonBytes) BinsonArray{  
-    *(a.list) = append(*(a.list), value)
+func (a *BinsonArray) PutBytes(value BinsonBytes) *BinsonArray{  
+    *a = append(*a, value)
     return a
 }
 
-func (a BinsonArray) PutBool(value BinsonBool) BinsonArray{  
-    *(a.list) = append(*(a.list), value)
+func (a *BinsonArray) PutBool(value BinsonBool) *BinsonArray{  
+    *a = append(*a, value)
     return a
 }
 
-func (a BinsonArray) PutFloat(value BinsonFloat) BinsonArray {
-    *(a.list) = append(*(a.list), value)
+func (a *BinsonArray) PutFloat(value BinsonFloat) *BinsonArray {
+    *a = append(*a, value)
     return a
 }
 
-func (a BinsonArray) Put(value interface{}) (BinsonArray){
+func (a *BinsonArray) Put(value interface{}) (*BinsonArray){
     switch o := value.(type) {
         case Binson:
             a.PutBinson(o)
-        case BinsonArray:
+        case *BinsonArray:
             a.PutArray(o)
         case int:
             a.PutInt(BinsonInt(o))
