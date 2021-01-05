@@ -124,6 +124,24 @@ func TestBinson(t *testing.T) {
     assert.Equal(t, 2, a.Size(), "Wrong length")
     want, _ = hex.DecodeString("4214016114016343")
     assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
+	
+	// Parse empty
+	data, _ := hex.DecodeString("4041")
+	obj, err := Parse(data)
+	assert.Equal(t, nil, err, "Got error")
+	assert.Equal(t, data, obj.ToBytes(), "Bytes do not match")
+	
+	// Parse Binson
+	data, _ = hex.DecodeString("401401611004140162140467696769140163404114016442431401651803010203140166441401674614ae47e17a543e4041")
+	obj, err = Parse(data)
+	assert.Equal(t, nil, err, "Got error")
+	assert.Equal(t, data, obj.ToBytes(), "Bytes do not match")
+	
+	// Parse Array
+	data, _ = hex.DecodeString("40140161421004140467696769404142431803010203454614ae47e17a543e404341")
+	obj, err = Parse(data)
+	assert.Equal(t, nil, err, "Got error")
+	assert.Equal(t, data, obj.ToBytes(), "Bytes do not match")
 }
 
 

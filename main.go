@@ -145,15 +145,133 @@ func (a BinsonFloat) ToBytes() []byte {
     return buf.Bytes()
 }
 
-/*
-func ParseField(buf *Buffer) Field, string {
-    
+func ReadInteger(prefix byte, buf *bytes.Buffer) (int64, error){
+    switch prefix {
+	    case STRING1, BYTES1, INTEGER1:
+		    var value int8 
+			err := binary.Read(buf, binary.LittleEndian, &value)
+			return int64(value), err
+		case STRING2, BYTES2, INTEGER2:
+		    var value int16
+			err := binary.Read(buf, binary.LittleEndian, &value)
+			return int64(value), err
+		case STRING4, BYTES4, INTEGER4:
+		    var value int32 
+			err := binary.Read(buf, binary.LittleEndian, &value)
+			return int64(value), err
+		case INTEGER8:
+		    var value int64 
+			err := binary.Read(buf, binary.LittleEndian, &value)
+			return value, err
+		default:
+		    panic(fmt.Sprintf("Unknown prefix: %X", prefix))
+	}
 }
 
-func Parse(bytes []byte) Binson, err{
-    buf := NewBuffer(bytes []byte)
-    buf.WriteByte
-}*/
+func ParseBinson(buf *bytes.Buffer) (Binson, error) {
+    b := NewBinson()
+	for {
+	    next, err := buf.ReadByte()
+		if err != nil {
+	        return nil, err
+	    } else if next == END {
+	        return b, nil
+	    }
+
+		name, err := ParseString(next, buf)
+		if err != nil {
+	        return nil, err
+	    }
+		next, err = buf.ReadByte()
+		if err != nil {
+	        return nil, err
+	    }
+		field, err1 := ParseField(next, buf)
+		if err1 != nil {
+	        return nil, err1
+	    }
+        b.Put(name, field)
+	}
+}
+
+func ParseArray(buf *bytes.Buffer) (*BinsonArray, error) {
+    a := NewBinsonArray()
+	for {
+	    next, errRead := buf.ReadByte()
+		if errRead != nil {
+	        return nil, errRead
+	    } else if next == END_ARRAY {
+	        return a, nil
+	    }
+
+		field, errParse := ParseField(next, buf)
+		if errParse != nil {
+	        return nil, errParse
+	    }
+        a.Put(field)
+	}
+}
+
+func ParseString(start byte, buf *bytes.Buffer) (BinsonString, error) {
+    length, err := ReadInteger(start, buf)
+	data := buf.Next(int(length))
+	text := string(data)
+	return BinsonString(text), err
+}
+
+func ParseBytes(start byte, buf *bytes.Buffer) (BinsonBytes, error) {
+    length, err := ReadInteger(start, buf)
+	data := buf.Next(int(length))
+	return BinsonBytes(data), err
+}
+
+func ParseInteger(start byte, buf *bytes.Buffer) (BinsonInt, error) {
+    value, err := ReadInteger(start, buf)
+	return BinsonInt(value), err
+}
+
+func ParseFloat(buf *bytes.Buffer) (BinsonFloat, error) {
+    var value float64 
+	err := binary.Read(buf, binary.LittleEndian, &value)
+	return BinsonFloat(value), err
+}
+
+func ParseField(start byte, buf *bytes.Buffer) (Field, error) {
+	switch start {
+        case BEGIN:
+            return ParseBinson(buf)
+		case BEGIN_ARRAY:
+			return ParseArray(buf)
+		case STRING1, STRING2, STRING4:
+            return ParseString(start, buf)
+	    case BYTES1, BYTES2, BYTES4:
+            return ParseBytes(start, buf)
+		case INTEGER1, INTEGER2, INTEGER4, INTEGER8:
+            return ParseInteger(start, buf)
+		case TRUE:
+		    return BinsonBool(true), nil
+		case FALSE:
+		    return BinsonBool(false), nil
+		case DOUBLE:
+		    return ParseFloat(buf)
+        default: 
+            return nil, fmt.Errorf("Unknown byte: %X", start)
+    }
+}
+ 
+func Parse(data []byte) (Binson, error) {
+    buf := bytes.NewBuffer(data)
+	start, err := buf.ReadByte()
+	if err != nil {
+	    return nil, err
+	}
+	field, err := ParseField(start, buf)
+	binson, ok := field.(Binson)
+	if !ok {
+	    return nil, fmt.Errorf("Got none Binson type: %T", field)
+	}
+	return binson, err
+}
 
 func NewBinson() Binson {
     b := make(map[BinsonString]Field)
@@ -221,14 +339,24 @@ func (b Binson) Put(name BinsonString, value interface{}) (Binson) {
             b.PutArray(name, o)
         case int:
             b.PutInt(name, BinsonInt(o))
+		case BinsonInt:
+            b.PutInt(name, o)
         case string:
             b.PutString(name, BinsonString(o))
+		case BinsonString:
+            b.PutString(name, o)
         case []byte:
             b.PutBytes(name, BinsonBytes(o))
+		case BinsonBytes:
+            b.PutBytes(name, o)
         case bool:
             b.PutBool(name, BinsonBool(o))
+		case BinsonBool:
+            b.PutBool(name, o)
 		case float64:
             b.PutFloat(name, BinsonFloat(o))
+		case BinsonFloat:
+            b.PutFloat(name, o)
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }
@@ -291,14 +419,24 @@ func (a *BinsonArray) Put(value interface{}) (*BinsonArray){
             a.PutArray(o)
         case int:
             a.PutInt(BinsonInt(o))
+		case BinsonInt:
+            a.PutInt(o)	
         case string:
             a.PutString(BinsonString(o))
+		case BinsonString:
+            a.PutString(o)
         case []byte:
             a.PutBytes(BinsonBytes(o))
+		case BinsonBytes:
+            a.PutBytes(o)
         case bool:
             a.PutBool(BinsonBool(o))
+		case BinsonBool:
+            a.PutBool(o)
         case float64:
             a.PutFloat(BinsonFloat(o))
+		case BinsonFloat:
+            a.PutFloat(o)
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }
