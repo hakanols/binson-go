@@ -48,9 +48,29 @@ func (b Binson) PutArray(name BinsonString, value *BinsonArray) Binson {
     return b
 }
 
+func (b Binson) HasArray(name BinsonString) bool {
+	_, ok := b[name].(*BinsonArray)
+	return ok
+}
+
+func (b Binson) GetArray(name BinsonString) (*BinsonArray, bool) {
+    obj, ok := b[name].(*BinsonArray)
+	return obj, ok
+}
+
 func (b Binson) PutInt(name BinsonString, value BinsonInt) Binson {
     b[name] = value
     return b
+}
+
+func (b Binson) HasInt(name BinsonString) bool {
+	_, ok := b[name].(BinsonInt)
+	return ok
+}
+
+func (b Binson) GetInt(name BinsonString) (int64, bool) {
+    obj, ok := b[name].(BinsonInt)
+	return int64(obj), ok
 }
 
 func (b Binson) PutString(name BinsonString, value BinsonString) Binson {
@@ -58,9 +78,29 @@ func (b Binson) PutString(name BinsonString, value BinsonString) Binson {
     return b
 }
 
+func (b Binson) HasString(name BinsonString) bool {
+	_, ok := b[name].(BinsonString)
+	return ok
+}
+
+func (b Binson) GetString(name BinsonString) (string, bool) {
+    obj, ok := b[name].(BinsonString)
+	return string(obj), ok
+}
+
 func (b Binson) PutBytes(name BinsonString, value BinsonBytes) Binson {
     b[name] = value
     return b
+}
+
+func (b Binson) HasBytes(name BinsonString) bool {
+	_, ok := b[name].(BinsonBytes)
+	return ok
+}
+
+func (b Binson) GetBytes(name BinsonString) ([]byte, bool) {
+    obj, ok := b[name].(BinsonBytes)
+	return []byte(obj), ok
 }
 
 func (b Binson) PutBool(name BinsonString, value BinsonBool) Binson {
@@ -68,9 +108,29 @@ func (b Binson) PutBool(name BinsonString, value BinsonBool) Binson {
     return b
 }
 
+func (b Binson) HasBool(name BinsonString) bool {
+	_, ok := b[name].(BinsonBool)
+	return ok
+}
+
+func (b Binson) GetBool(name BinsonString) (bool, bool) {
+    obj, ok := b[name].(BinsonBool)
+	return bool(obj), ok
+}
+
 func (b Binson) PutFloat(name BinsonString, value BinsonFloat) Binson {
     b[name] = value
     return b
+}
+
+func (b Binson) HasFloat(name BinsonString) bool {
+	_, ok := b[name].(BinsonFloat)
+	return ok
+}
+
+func (b Binson) GetFloat(name BinsonString) (float64, bool) {
+    obj, ok := b[name].(BinsonFloat)
+	return float64(obj), ok
 }
 
 func (b Binson) Put(name BinsonString, value interface{}) (Binson) {
