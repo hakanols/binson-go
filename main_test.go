@@ -206,6 +206,71 @@ func TestBinson(t *testing.T) {
 	obj, err = Parse(data)
 	assert.Equal(t, nil, err, "Got error")
 	assert.Equal(t, data, obj.ToBytes(), "Bytes do not match")
+	arr, _ := obj.GetArray("a")
+		
+	assert.True(t, arr.HasBinson(2), "Should have object")
+	assert.False(t, arr.HasBinson(0), "Should not have object")
+	// assert.False(t, arr.HasBinson(9), "Should not have object") ToDo no panic if out of range
+	bo, ok = arr.GetBinson(2)
+	assert.Equal(t, NewBinson(), bo, "Shall get a Binson on fail")
+	assert.True(t, ok, "Should have object")
+	bo, ok = arr.GetBinson(0)
+	assert.False(t, ok, "Should have object")
+	assert.Equal(t, Binson(nil), bo, "Shall not get any Binson on fail")
+	
+	assert.True(t, arr.HasArray(3), "Should have object")
+	assert.False(t, arr.HasArray(0), "Should not have object")
+	// assert.False(t, arr.HasArray(9), "Should not have object") ToDo no panic if out of range
+	ao, ok = arr.GetArray(3)
+	assert.Equal(t, NewBinsonArray(), ao, "Shall get a Binson on fail")
+	assert.True(t, ok, "Should have object")
+	_, ok = arr.GetArray(0)
+	assert.False(t, ok, "Should have object")
+	
+	assert.True(t, arr.HasInt(0), "Should have object")
+	assert.False(t, arr.HasInt(1), "Should not have object")
+	// assert.False(t, arr.HasArray(9), "Should not have object") ToDo no panic if out of range
+	io, ok = arr.GetInt(0)
+	assert.Equal(t, int64(4), io, "Wrong value")
+	assert.True(t, ok, "Should have object")
+	_, ok = arr.GetInt(1)
+	assert.False(t, ok, "Should have object")
+
+	assert.True(t, arr.HasString(1), "Should have object")
+	assert.False(t, arr.HasString(0), "Should not have object")
+	// assert.False(t, arr.HasArray(9), "Should not have object") ToDo no panic if out of range	
+	so, ok = arr.GetString(1)
+	assert.Equal(t, "gigi", so, "Wrong value")
+	assert.True(t, ok, "Should have object")
+	_, ok = arr.GetString(0)
+	assert.False(t, ok, "Should have object")
+	
+	assert.True(t, arr.HasBytes(4), "Should have object")
+	assert.False(t, arr.HasBytes(0), "Should not have object")
+	// assert.False(t, arr.HasArray(9), "Should not have object") ToDo no panic if out of range
+	yo, ok = arr.GetBytes(4)
+	assert.Equal(t, []byte{1, 2, 3}, yo, "Wrong value")
+	assert.True(t, ok, "Should have object")
+	_, ok = arr.GetBytes(0)
+	assert.False(t, ok, "Should have object")
+	
+	assert.True(t, arr.HasFloat(6), "Should have object")
+	assert.False(t, arr.HasFloat(0), "Should not have object")
+	// assert.False(t, arr.HasArray(9), "Should not have object") ToDo no panic if out of range	
+	fo, ok = arr.GetFloat(6)
+	assert.Equal(t, 30.33, fo, "Wrong value")
+	assert.True(t, ok, "Should have object")
+	_, ok = arr.GetFloat(0)
+	assert.False(t, ok, "Should have object")
+	
+	assert.True(t, arr.HasBool(5), "Should have object")
+	assert.False(t, arr.HasBool(0), "Should not have object")
+	// assert.False(t, arr.HasArray(9), "Should not have object") ToDo no panic if out of range
+	oo, ok = arr.GetBool(5)
+	assert.Equal(t, false, oo, "Wrong value")
+	assert.True(t, ok, "Should have object")
+	_, ok = arr.GetBool(0)
+	assert.False(t, ok, "Should have object")
 }
 
 
