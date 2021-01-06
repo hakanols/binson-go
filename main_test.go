@@ -2,18 +2,9 @@ package binson
 
 import (
     "testing"
-    "reflect"
     "encoding/hex"
     "github.com/stretchr/testify/assert"
 )
-
-func ByteEqual(t *testing.T, got []byte, wantString string){
-    want, err := hex.DecodeString(wantString)
-    //if err != nil || bytes.Compare(got, want) != 0 {
-    if err != nil || !reflect.DeepEqual(got, want){
-        t.Errorf("Failed\nGot:  %s\nWant: %s", hex.EncodeToString(got), wantString)
-    }
-}
 
 func TestBinson(t *testing.T) {
     want, _ := hex.DecodeString("4041")
