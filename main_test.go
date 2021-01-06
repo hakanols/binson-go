@@ -137,6 +137,18 @@ func TestBinson(t *testing.T) {
 	assert.Equal(t, nil, err, "Got error")
 	assert.Equal(t, data, obj.ToBytes(), "Bytes do not match")
 	
+	assert.True(t, obj.HasBinson("c"), "Should have object")
+	assert.False(t, obj.HasBinson("a"), "Should not have object")
+	assert.False(t, obj.HasBinson("x"), "Should not have object")
+	
+	want, _ = hex.DecodeString("4041")
+	o, ok := obj.GetBinson("c")
+	assert.Equal(t, want, o.ToBytes(), "Shall get a Binson on fail")
+	assert.True(t, ok, "Should have object")
+	o, ok = obj.GetBinson("a")
+	assert.False(t, ok, "Should have object")
+	assert.Equal(t, Binson(nil), o, "Shall not get any Binson on fail")
+	
 	// Parse Array
 	data, _ = hex.DecodeString("40140161421004140467696769404142431803010203454614ae47e17a543e404341")
 	obj, err = Parse(data)

@@ -301,6 +301,16 @@ func (b Binson) PutBinson(name BinsonString, value Binson) Binson {
     return b
 }
 
+func (b Binson) HasBinson(name BinsonString) bool {
+	_, ok := b[name].(Binson)
+	return ok
+}
+
+func (b Binson) GetBinson(name BinsonString) (Binson, bool) {
+    obj, ok := b[name].(Binson)
+	return obj, ok
+}
+
 func (b Binson) PutArray(name BinsonString, value *BinsonArray) Binson {
     b[name] = value
     return b
