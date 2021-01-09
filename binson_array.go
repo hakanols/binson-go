@@ -23,13 +23,13 @@ func (a *BinsonArray) PutArray(value *BinsonArray) *BinsonArray {
 }
 
 func (a *BinsonArray) HasArray(index int) bool {
-	_, ok := (*a)[index].(*BinsonArray)
-	return ok
+    _, ok := (*a)[index].(*BinsonArray)
+    return ok
 }
 
 func (a *BinsonArray) GetArray(index int) (*BinsonArray, bool) {
     obj, ok := (*a)[index].(*BinsonArray)
-	return obj, ok
+    return obj, ok
 }
 
 func (a *BinsonArray) PutBinson(value Binson) *BinsonArray {
@@ -38,88 +38,88 @@ func (a *BinsonArray) PutBinson(value Binson) *BinsonArray {
 }
 
 func (a *BinsonArray) HasBinson(index int) bool {
-	_, ok := (*a)[index].(Binson)
-	return ok
+    _, ok := (*a)[index].(Binson)
+    return ok
 }
 
 func (a *BinsonArray) GetBinson(index int) (Binson, bool) {
     obj, ok := (*a)[index].(Binson)
-	return obj, ok
+    return obj, ok
 }
 
-func (a *BinsonArray) PutInt(value BinsonInt) *BinsonArray{  
-    *a = append(*a, value)
+func (a *BinsonArray) PutInt( value int64) *BinsonArray {
+    *a = append(*a, binsonInt(value))
     return a
 }
 
 func (a *BinsonArray) HasInt(index int) bool {
-	_, ok := (*a)[index].(BinsonInt)
-	return ok
+    _, ok := (*a)[index].(binsonInt)
+    return ok
 }
 
 func (a *BinsonArray) GetInt(index int) (int64, bool) {
-    obj, ok := (*a)[index].(BinsonInt)
-	return int64(obj), ok
+    obj, ok := (*a)[index].(binsonInt)
+    return int64(obj), ok
 }
 
-func (a *BinsonArray) PutString(value BinsonString) *BinsonArray{  
-    *a = append(*a, value)
+func (a *BinsonArray) PutString(value string) *BinsonArray {
+    *a = append(*a, binsonString(value))
     return a
 }
 
 func (a *BinsonArray) HasString(index int) bool {
-	_, ok := (*a)[index].(BinsonString)
-	return ok
+    _, ok := (*a)[index].(binsonString)
+    return ok
 }
 
 func (a *BinsonArray) GetString(index int) (string, bool) {
-    obj, ok := (*a)[index].(BinsonString)
-	return string(obj), ok
+    obj, ok := (*a)[index].(binsonString)
+    return string(obj), ok
 }
 
-func (a *BinsonArray) PutBytes(value BinsonBytes) *BinsonArray{  
-    *a = append(*a, value)
+func (a *BinsonArray) PutBytes(value []byte) *BinsonArray {
+    *a = append(*a, binsonBytes(value))
     return a
 }
 
 func (a *BinsonArray) HasBytes(index int) bool {
-	_, ok := (*a)[index].(BinsonBytes)
-	return ok
+    _, ok := (*a)[index].(binsonBytes)
+    return ok
 }
 
 func (a *BinsonArray) GetBytes(index int) ([]byte, bool) {
-    obj, ok := (*a)[index].(BinsonBytes)
-	return []byte(obj), ok
+    obj, ok := (*a)[index].(binsonBytes)
+    return []byte(obj), ok
 }
 
-func (a *BinsonArray) PutBool(value BinsonBool) *BinsonArray{  
-    *a = append(*a, value)
+func (a *BinsonArray) PutBool(value bool) *BinsonArray {
+    *a = append(*a, binsonBool(value))
     return a
 }
 
 func (a *BinsonArray) HasBool(index int) bool {
-	_, ok := (*a)[index].(BinsonBool)
-	return ok
+    _, ok := (*a)[index].(binsonBool)
+    return ok
 }
 
 func (a *BinsonArray) GetBool(index int) (bool, bool) {
-    obj, ok := (*a)[index].(BinsonBool)
-	return bool(obj), ok
+    obj, ok := (*a)[index].(binsonBool)
+    return bool(obj), ok
 }
 
-func (a *BinsonArray) PutFloat(value BinsonFloat) *BinsonArray {
-    *a = append(*a, value)
+func (a *BinsonArray) PutFloat(value float64) *BinsonArray {
+    *a = append(*a, binsonFloat(value))
     return a
 }
 
 func (a *BinsonArray) HasFloat(index int) bool {
-	_, ok := (*a)[index].(BinsonFloat)
-	return ok
+    _, ok := (*a)[index].(binsonFloat)
+    return ok
 }
 
 func (a *BinsonArray) GetFloat(index int) (float64, bool) {
-    obj, ok := (*a)[index].(BinsonFloat)
-	return float64(obj), ok
+    obj, ok := (*a)[index].(binsonFloat)
+    return float64(obj), ok
 }
 
 func (a *BinsonArray) Put(value interface{}) (*BinsonArray){
@@ -129,24 +129,16 @@ func (a *BinsonArray) Put(value interface{}) (*BinsonArray){
         case *BinsonArray:
             a.PutArray(o)
         case int:
-            a.PutInt(BinsonInt(o))
-		case BinsonInt:
-            a.PutInt(o)	
+            a.PutInt(int64(o))
+        case int64:
+            a.PutInt(o)
         case string:
-            a.PutString(BinsonString(o))
-		case BinsonString:
             a.PutString(o)
         case []byte:
-            a.PutBytes(BinsonBytes(o))
-		case BinsonBytes:
             a.PutBytes(o)
         case bool:
-            a.PutBool(BinsonBool(o))
-		case BinsonBool:
             a.PutBool(o)
         case float64:
-            a.PutFloat(BinsonFloat(o))
-		case BinsonFloat:
             a.PutFloat(o)
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
