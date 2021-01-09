@@ -1,4 +1,4 @@
-module example.com/binson
+module github.com/hakanols/binson-go
 
 go 1.15
 
