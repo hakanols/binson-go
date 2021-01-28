@@ -4,15 +4,18 @@ import (
     "fmt"
 )
 
+// Returns a new empty binson array.
 func NewBinsonArray() *BinsonArray {
     a := BinsonArray([]field{})
     return &a
 }
 
+// Return length of binson array.
 func (a *BinsonArray) Size() int{
     return len(*a);
 }
 
+// Removes a given field if it exists.
 func (a *BinsonArray) Remove(index int){
     *a = append( (*a)[:index], (*a)[index+1:]...)
 }
@@ -117,6 +120,7 @@ func (a *BinsonArray) addField(value field) *BinsonArray {
     return a
 }
 
+// Adds an element to the array.
 func (a *BinsonArray) Put(value interface{}) (*BinsonArray){
     switch o := value.(type) {
         case Binson:

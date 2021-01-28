@@ -53,10 +53,6 @@ func packInteger(value int64) []byte {
     return buf.Bytes()
 }
 
-func (b Binson) ToBytes() []byte {
-    return b.toBytes()
-}
-
 func (b Binson) toBytes() []byte {
     var buf bytes.Buffer
     buf.WriteByte(binsonBegin)
@@ -270,6 +266,7 @@ func parseField(start byte, buf *bytes.Buffer) (interface{}, error) {
     }
 }
 
+// Parses bytes to a Binson object.
 func Parse(data []byte) (Binson, error) {
     buf := bytes.NewBuffer(data)
     start, err := buf.ReadByte()
@@ -282,4 +279,9 @@ func Parse(data []byte) (Binson, error) {
         return nil, fmt.Errorf("Got none Binson type: %T", field)
     }
     return binson, err
+}
+
+// Writes this Binson object to bytes
+func (b Binson) ToBytes() []byte {
+    return b.toBytes()
 }
