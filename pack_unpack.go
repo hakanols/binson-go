@@ -8,38 +8,38 @@ import (
 )
 
 const(
-    BEGIN byte = 0x40
-    END = 0x41
-    BEGIN_ARRAY = 0x42
-    END_ARRAY = 0x43 
-    TRUE = 0x44
-    FALSE = 0x45
-    INTEGER1 = 0x10 
-    INTEGER2 = 0x11 
-    INTEGER4 = 0x12
-    INTEGER8 = 0x13
-    DOUBLE = 0x46
-    STRING1 = 0x14
-    STRING2 = 0x15
-    STRING4 = 0x16
-    BYTES1 = 0x18 
-    BYTES2 = 0x19 
-    BYTES4 = 0x1a
+    binsonBegin byte = 0x40
+    binsonEnd = 0x41
+    binsonBeginArray = 0x42
+    binsonEndArray = 0x43 
+    binsonTrue = 0x44
+    binsonFalse = 0x45
+    binsonInteger1 = 0x10 
+    binsonInteger2 = 0x11 
+    binsonInteger4 = 0x12
+    binsonInteger8 = 0x13
+    binsonDouble = 0x46
+    binsonString1 = 0x14
+    binsonString2 = 0x15
+    binsonString4 = 0x16
+    binsonBytes1 = 0x18 
+    binsonBytes2 = 0x19 
+    binsonBytes4 = 0x1a
 )
 
-type Field interface {
+type field interface {
     toBytes() []byte
 }
 
-type Binson map[binsonString]Field
-type BinsonArray []Field
+type Binson map[binsonString]field
+type BinsonArray []field
 type binsonInt int64
 type binsonString string
 type binsonBytes []byte
 type binsonBool bool
 type binsonFloat float64
 
-func PackInteger(value int64) []byte {
+func packInteger(value int64) []byte {
     buf := new(bytes.Buffer)
     if math.MinInt8 <= value && value <= math.MaxInt8 {
         binary.Write(buf, binary.LittleEndian, int8(value))
@@ -59,12 +59,12 @@ func (b Binson) ToBytes() []byte {
 
 func (b Binson) toBytes() []byte {
     var buf bytes.Buffer
-    buf.WriteByte(BEGIN)
+    buf.WriteByte(binsonBegin)
     for _, key := range b.FieldNames(){
         buf.Write(binsonString(key).toBytes())
         buf.Write(b[binsonString(key)].toBytes())
     }
-    buf.WriteByte(END)
+    buf.WriteByte(binsonEnd)
     return buf.Bytes()
 }
 
@@ -74,26 +74,26 @@ func (b *BinsonArray) ToBytes() []byte {
 
 func (b *BinsonArray) toBytes() []byte {
     var buf bytes.Buffer
-    buf.WriteByte(BEGIN_ARRAY)
+    buf.WriteByte(binsonBeginArray)
     for _, field := range *b {
         buf.Write(field.toBytes())
     }
-    buf.WriteByte(END_ARRAY)
+    buf.WriteByte(binsonEndArray)
     return buf.Bytes()
 }
 
 func (a binsonInt) toBytes() []byte {
     buf := new(bytes.Buffer)
-    packedInt := PackInteger(int64(a))
+    packedInt := packInteger(int64(a))
     switch len(packedInt) {
         case 1:
-            buf.WriteByte(INTEGER1)
+            buf.WriteByte(binsonInteger1)
         case 2:
-            buf.WriteByte(INTEGER2)
+            buf.WriteByte(binsonInteger2)
         case 4:
-            buf.WriteByte(INTEGER4)
+            buf.WriteByte(binsonInteger4)
         case 8:
-            buf.WriteByte(INTEGER8)
+            buf.WriteByte(binsonInteger8)
         default: 
             panic(fmt.Sprintf("Can not handle byte array of size %d", len(packedInt)))
     }
@@ -103,14 +103,14 @@ func (a binsonInt) toBytes() []byte {
 
 func (a binsonString) toBytes() []byte {
     buf := new(bytes.Buffer)
-    lengtBytes := PackInteger(int64(len(a)))
+    lengtBytes := packInteger(int64(len(a)))
     switch len(lengtBytes) {
         case 1:
-            buf.WriteByte(STRING1)
+            buf.WriteByte(binsonString1)
         case 2:
-            buf.WriteByte(STRING2)
+            buf.WriteByte(binsonString2)
         case 4:
-            buf.WriteByte(STRING4)
+            buf.WriteByte(binsonString4)
         default: 
             panic(fmt.Sprintf("Can not handle byte array of size %d", len(lengtBytes)))
     }
@@ -121,14 +121,14 @@ func (a binsonString) toBytes() []byte {
 
 func (a binsonBytes) toBytes() []byte {
     buf := new(bytes.Buffer)
-    lengtBytes := PackInteger(int64(len(a)))
+    lengtBytes := packInteger(int64(len(a)))
     switch len(lengtBytes) {
         case 1:
-            buf.WriteByte(BYTES1)
+            buf.WriteByte(binsonBytes1)
         case 2:
-            buf.WriteByte(BYTES2)
+            buf.WriteByte(binsonBytes2)
         case 4:
-            buf.WriteByte(BYTES4)
+            buf.WriteByte(binsonBytes4)
         default: 
             panic(fmt.Sprintf("Can not handle byte array of size %d", len(lengtBytes)))
     }
@@ -139,37 +139,41 @@ func (a binsonBytes) toBytes() []byte {
 
 func (a binsonBool) toBytes() []byte {
     if a {
-        return []byte{TRUE}
+        return []byte{binsonTrue}
     } else {
-        return []byte{FALSE}
+        return []byte{binsonFalse}
     }
 }
 
 func (a binsonFloat) toBytes() []byte {
     buf := new(bytes.Buffer)
-    buf.WriteByte(DOUBLE)
+    buf.WriteByte(binsonDouble)
     binary.Write(buf, binary.LittleEndian, float64(a))
     return buf.Bytes()
 }
 
 func readInteger(prefix byte, buf *bytes.Buffer) (int64, error) {
     switch prefix {
-        case STRING1, BYTES1, INTEGER1:
+        case binsonString1, binsonBytes1, binsonInteger1:
             var value int8 
             err := binary.Read(buf, binary.LittleEndian, &value)
             return int64(value), err
-        case STRING2, BYTES2, INTEGER2:
+
+        case binsonString2, binsonBytes2, binsonInteger2:
             var value int16
             err := binary.Read(buf, binary.LittleEndian, &value)
             return int64(value), err
-        case STRING4, BYTES4, INTEGER4:
+
+        case binsonString4, binsonBytes4, binsonInteger4:
             var value int32 
             err := binary.Read(buf, binary.LittleEndian, &value)
             return int64(value), err
-        case INTEGER8:
+
+        case binsonInteger8:
             var value int64 
             err := binary.Read(buf, binary.LittleEndian, &value)
             return value, err
+
         default:
             panic(fmt.Sprintf("Unknown prefix: %X", prefix))
     }
@@ -181,7 +185,7 @@ func parseBinson(buf *bytes.Buffer) (Binson, error) {
         next, err := buf.ReadByte()
         if err != nil {
             return nil, err
-        } else if next == END {
+        } else if next == binsonEnd {
             return b, nil
         }
 
@@ -207,7 +211,7 @@ func parseArray(buf *bytes.Buffer) (*BinsonArray, error) {
         next, errRead := buf.ReadByte()
         if errRead != nil {
             return nil, errRead
-        } else if next == END_ARRAY {
+        } else if next == binsonEndArray {
             return a, nil
         }
 
@@ -245,27 +249,27 @@ func parseFloat(buf *bytes.Buffer) (float64, error) {
 
 func parseField(start byte, buf *bytes.Buffer) (interface{}, error) {
     switch start {
-        case BEGIN:
+        case binsonBegin:
             return parseBinson(buf)
-        case BEGIN_ARRAY:
+        case binsonBeginArray:
             return parseArray(buf)
-        case STRING1, STRING2, STRING4:
+        case binsonString1, binsonString2, binsonString4:
             return parseString(start, buf)
-        case BYTES1, BYTES2, BYTES4:
+        case binsonBytes1, binsonBytes2, binsonBytes4:
             return parseBytes(start, buf)
-        case INTEGER1, INTEGER2, INTEGER4, INTEGER8:
+        case binsonInteger1, binsonInteger2, binsonInteger4, binsonInteger8:
             return parseInteger(start, buf)
-        case TRUE:
+        case binsonTrue:
             return true, nil
-        case FALSE:
+        case binsonFalse:
             return false, nil
-        case DOUBLE:
+        case binsonDouble:
             return parseFloat(buf)
         default: 
             return nil, fmt.Errorf("Unknown byte: %X", start)
     }
 }
- 
+
 func Parse(data []byte) (Binson, error) {
     buf := bytes.NewBuffer(data)
     start, err := buf.ReadByte()

@@ -6,7 +6,7 @@ import (
 )
 
 func NewBinson() Binson {
-    b := make(map[binsonString]Field)
+    b := make(map[binsonString]field)
     return b
 }
 

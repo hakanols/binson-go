@@ -5,7 +5,7 @@ import (
 )
 
 func NewBinsonArray() *BinsonArray {
-    a := BinsonArray([]Field{})
+    a := BinsonArray([]field{})
     return &a
 }
 
@@ -17,12 +17,19 @@ func (a *BinsonArray) Remove(index int){
     *a = append( (*a)[:index], (*a)[index+1:]...)
 }
 
+func (a *BinsonArray) inRange(index int) bool{
+    return index < 0 || a.Size() <= index
+}
+
 func (a *BinsonArray) PutArray(value *BinsonArray) *BinsonArray {
     *a = append(*a, value)
     return a
 }
 
 func (a *BinsonArray) HasArray(index int) bool {
+    if a.inRange(index){
+        return false
+    }
     _, ok := (*a)[index].(*BinsonArray)
     return ok
 }
@@ -38,6 +45,9 @@ func (a *BinsonArray) PutBinson(value Binson) *BinsonArray {
 }
 
 func (a *BinsonArray) HasBinson(index int) bool {
+    if a.inRange(index){
+        return false
+    }
     _, ok := (*a)[index].(Binson)
     return ok
 }
@@ -53,6 +63,9 @@ func (a *BinsonArray) PutInt( value int64) *BinsonArray {
 }
 
 func (a *BinsonArray) HasInt(index int) bool {
+    if a.inRange(index){
+        return false
+    }
     _, ok := (*a)[index].(binsonInt)
     return ok
 }
@@ -68,6 +81,9 @@ func (a *BinsonArray) PutString(value string) *BinsonArray {
 }
 
 func (a *BinsonArray) HasString(index int) bool {
+    if a.inRange(index){
+        return false
+    }
     _, ok := (*a)[index].(binsonString)
     return ok
 }
@@ -83,6 +99,9 @@ func (a *BinsonArray) PutBytes(value []byte) *BinsonArray {
 }
 
 func (a *BinsonArray) HasBytes(index int) bool {
+    if a.inRange(index){
+        return false
+    }
     _, ok := (*a)[index].(binsonBytes)
     return ok
 }
@@ -98,6 +117,9 @@ func (a *BinsonArray) PutBool(value bool) *BinsonArray {
 }
 
 func (a *BinsonArray) HasBool(index int) bool {
+    if a.inRange(index){
+        return false
+    }
     _, ok := (*a)[index].(binsonBool)
     return ok
 }
@@ -113,6 +135,9 @@ func (a *BinsonArray) PutFloat(value float64) *BinsonArray {
 }
 
 func (a *BinsonArray) HasFloat(index int) bool {
+    if a.inRange(index){
+        return false
+    }
     _, ok := (*a)[index].(binsonFloat)
     return ok
 }
