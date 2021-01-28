@@ -15,69 +15,60 @@ func TestBinsonEmpty(t *testing.T) {
 func TestPutInt(t *testing.T) {
     want, _ := hex.DecodeString("40140161100441")
     b := NewBinson().
-        PutInt("a", 4)
+        Put("a", 4)
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 }
 
 func TestPutString(t *testing.T) {
     want, _ := hex.DecodeString("4014016214044772697341")
     b := NewBinson().
-        PutString("b", "Gris")
+        Put("b", "Gris")
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 }
 
 func TestPutBinson(t *testing.T) {
     want, _ := hex.DecodeString("4014016340140164140348656a4141")
     b := NewBinson().
-        PutBinson("c", NewBinson().
-            PutString("d", "Hej"))
+        Put("c", NewBinson().
+            Put("d", "Hej"))
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 }
 
 func TestPutArray(t *testing.T) {
     want, _ := hex.DecodeString("4014016142424310024341")
     b := NewBinson().
-        PutArray("a", NewBinsonArray().
-            PutArray(NewBinsonArray()).
-            PutInt(2) )
+        Put("a", NewBinsonArray().
+            Put(NewBinsonArray()).
+            Put(2) )
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 }
 
 func TestPutBytes(t *testing.T) {
     want, _ := hex.DecodeString("40140161180301020341")
     b := NewBinson().
-        PutBytes("a", []byte{1, 2, 3})
+        Put("a", []byte{1, 2, 3})
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 }
 
-func TestPutFloat(t *testing.T) {
+func TestPutBool(t *testing.T) {
     want, _ := hex.DecodeString("40140161441401624541")
     b := NewBinson().
-        PutBool("a", true).
-        PutBool("b", false)
+        Put("a", true).
+        Put("b", false)
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 }
 
 func TestBinson(t *testing.T) {
     want, _ := hex.DecodeString("4014016146e17a14ae4701374041")
     b := NewBinson().
-        PutFloat("a", 23.005)
+        Put("a", 23.005)
     assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
 }
 
 func TestBinsonPut(t *testing.T) {
     want, _ := hex.DecodeString("401401611004140162140467696769140163404114016442431401651803010203140166441401674614ae47e17a543e4041")
+
     b := NewBinson().
-        PutInt("a", 4).
-        PutString("b", "gigi").
-        PutBinson("c", NewBinson()).
-        PutArray("d", NewBinsonArray()).
-        PutBytes("e", []byte{1, 2, 3}).
-        PutBool("f", true).
-        PutFloat("g", 30.33)
-    assert.Equal(t, want, b.ToBytes(), "Bytes do not match")
-    
-    b = NewBinson().
         Put("a", 4).
         Put("b", "gigi").
         Put("c", NewBinson()).
@@ -91,16 +82,6 @@ func TestBinsonPut(t *testing.T) {
 func TestArrayPut(t *testing.T) {
     want, _ := hex.DecodeString("421004140467696769404142431803010203454614ae47e17a543e4043")
     a := NewBinsonArray().
-        PutInt(4).
-        PutString("gigi").
-        PutBinson(NewBinson()).
-        PutArray(NewBinsonArray()).
-        PutBytes([]byte{1, 2, 3}).
-        PutBool(false).
-        PutFloat(30.33)
-    assert.Equal(t, want, a.ToBytes(), "Bytes do not match")
-
-    a = NewBinsonArray().
         Put(4).
         Put("gigi").
         Put(NewBinson()).

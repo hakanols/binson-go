@@ -28,11 +28,6 @@ func (b Binson) Remove(name string) {
     delete(b, binsonString(name))
 }
 
-func (b Binson) PutBinson(name string, value Binson) Binson {
-    b[binsonString(name)] = value
-    return b
-}
-
 func (b Binson) HasBinson(name string) bool {
     _, ok := b[binsonString(name)].(Binson)
     return ok
@@ -41,11 +36,6 @@ func (b Binson) HasBinson(name string) bool {
 func (b Binson) GetBinson(name string) (Binson, bool) {
     obj, ok := b[binsonString(name)].(Binson)
     return obj, ok
-}
-
-func (b Binson) PutArray(name string, value *BinsonArray) Binson {
-    b[binsonString(name)] = value
-    return b
 }
 
 func (b Binson) HasArray(name string) bool {
@@ -58,11 +48,6 @@ func (b Binson) GetArray(name string) (*BinsonArray, bool) {
     return obj, ok
 }
 
-func (b Binson) PutInt(name string, value int64) Binson {
-    b[binsonString(name)] = binsonInt(value)
-    return b
-}
-
 func (b Binson) HasInt(name string) bool {
     _, ok := b[binsonString(name)].(binsonInt)
     return ok
@@ -71,11 +56,6 @@ func (b Binson) HasInt(name string) bool {
 func (b Binson) GetInt(name string) (int64, bool) {
     obj, ok := b[binsonString(name)].(binsonInt)
     return int64(obj), ok
-}
-
-func (b Binson) PutString(name string, value string) Binson {
-    b[binsonString(name)] = binsonString(value)
-    return b
 }
 
 func (b Binson) HasString(name string) bool {
@@ -88,11 +68,6 @@ func (b Binson) GetString(name string) (string, bool) {
     return string(obj), ok
 }
 
-func (b Binson) PutBytes(name string, value []byte) Binson {
-    b[binsonString(name)] = binsonBytes(value)
-    return b
-}
-
 func (b Binson) HasBytes(name string) bool {
     _, ok := b[binsonString(name)].(binsonBytes)
     return ok
@@ -103,11 +78,6 @@ func (b Binson) GetBytes(name string) ([]byte, bool) {
     return []byte(obj), ok
 }
 
-func (b Binson) PutBool(name string, value bool) Binson {
-    b[binsonString(name)] = binsonBool(value)
-    return b
-}
-
 func (b Binson) HasBool(name string) bool {
     _, ok := b[binsonString(name)].(binsonBool)
     return ok
@@ -116,11 +86,6 @@ func (b Binson) HasBool(name string) bool {
 func (b Binson) GetBool(name string) (bool, bool) {
     obj, ok := b[binsonString(name)].(binsonBool)
     return bool(obj), ok
-}
-
-func (b Binson) PutFloat(name string, value float64) Binson {
-    b[binsonString(name)] = binsonFloat(value)
-    return b
 }
 
 func (b Binson) HasFloat(name string) bool {
@@ -134,23 +99,24 @@ func (b Binson) GetFloat(name string) (float64, bool) {
 }
 
 func (b Binson) Put(name string, value interface{}) (Binson) {
+    key := binsonString(name)
     switch o := value.(type) {
         case Binson:
-            b.PutBinson(name, o)
+            b[key] = o
         case *BinsonArray:
-            b.PutArray(name, o)
+            b[key] = o
         case int:
-            b.PutInt(name, int64(o))
+            b[key] = binsonInt(int64(o))
         case int64:
-            b.PutInt(name, o)
+            b[key] = binsonInt(o)
         case string:
-            b.PutString(name, o)
+            b[key] = binsonString(o)
         case []byte:
-            b.PutBytes(name, o)
+            b[key] = binsonBytes(o)
         case bool:
-            b.PutBool(name, o)
+            b[key] = binsonBool(o)
         case float64:
-            b.PutFloat(name, o)
+            b[key] = binsonFloat(o)
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }

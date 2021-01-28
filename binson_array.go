@@ -21,11 +21,6 @@ func (a *BinsonArray) inRange(index int) bool{
     return index < 0 || a.Size() <= index
 }
 
-func (a *BinsonArray) PutArray(value *BinsonArray) *BinsonArray {
-    *a = append(*a, value)
-    return a
-}
-
 func (a *BinsonArray) HasArray(index int) bool {
     if a.inRange(index){
         return false
@@ -37,11 +32,6 @@ func (a *BinsonArray) HasArray(index int) bool {
 func (a *BinsonArray) GetArray(index int) (*BinsonArray, bool) {
     obj, ok := (*a)[index].(*BinsonArray)
     return obj, ok
-}
-
-func (a *BinsonArray) PutBinson(value Binson) *BinsonArray {
-    *a = append(*a, value)
-    return a
 }
 
 func (a *BinsonArray) HasBinson(index int) bool {
@@ -57,11 +47,6 @@ func (a *BinsonArray) GetBinson(index int) (Binson, bool) {
     return obj, ok
 }
 
-func (a *BinsonArray) PutInt( value int64) *BinsonArray {
-    *a = append(*a, binsonInt(value))
-    return a
-}
-
 func (a *BinsonArray) HasInt(index int) bool {
     if a.inRange(index){
         return false
@@ -73,11 +58,6 @@ func (a *BinsonArray) HasInt(index int) bool {
 func (a *BinsonArray) GetInt(index int) (int64, bool) {
     obj, ok := (*a)[index].(binsonInt)
     return int64(obj), ok
-}
-
-func (a *BinsonArray) PutString(value string) *BinsonArray {
-    *a = append(*a, binsonString(value))
-    return a
 }
 
 func (a *BinsonArray) HasString(index int) bool {
@@ -93,11 +73,6 @@ func (a *BinsonArray) GetString(index int) (string, bool) {
     return string(obj), ok
 }
 
-func (a *BinsonArray) PutBytes(value []byte) *BinsonArray {
-    *a = append(*a, binsonBytes(value))
-    return a
-}
-
 func (a *BinsonArray) HasBytes(index int) bool {
     if a.inRange(index){
         return false
@@ -109,11 +84,6 @@ func (a *BinsonArray) HasBytes(index int) bool {
 func (a *BinsonArray) GetBytes(index int) ([]byte, bool) {
     obj, ok := (*a)[index].(binsonBytes)
     return []byte(obj), ok
-}
-
-func (a *BinsonArray) PutBool(value bool) *BinsonArray {
-    *a = append(*a, binsonBool(value))
-    return a
 }
 
 func (a *BinsonArray) HasBool(index int) bool {
@@ -129,11 +99,6 @@ func (a *BinsonArray) GetBool(index int) (bool, bool) {
     return bool(obj), ok
 }
 
-func (a *BinsonArray) PutFloat(value float64) *BinsonArray {
-    *a = append(*a, binsonFloat(value))
-    return a
-}
-
 func (a *BinsonArray) HasFloat(index int) bool {
     if a.inRange(index){
         return false
@@ -147,24 +112,30 @@ func (a *BinsonArray) GetFloat(index int) (float64, bool) {
     return float64(obj), ok
 }
 
+func (a *BinsonArray) addField(value field) *BinsonArray {
+    *a = append(*a, value)
+    return a
+}
+
 func (a *BinsonArray) Put(value interface{}) (*BinsonArray){
     switch o := value.(type) {
         case Binson:
-            a.PutBinson(o)
+			a.addField(o)
         case *BinsonArray:
-            a.PutArray(o)
+			a.addField(o)
         case int:
-            a.PutInt(int64(o))
+            a.addField(binsonInt(int64(o)))
         case int64:
-            a.PutInt(o)
+            a.addField(binsonInt(o))
         case string:
-            a.PutString(o)
+            a.addField(binsonString(o))
         case []byte:
-            a.PutBytes(o)
+            a.addField(binsonBytes(o))
         case bool:
-            a.PutBool(o)
+            a.addField(binsonBool(o))
         case float64:
-            a.PutFloat(o)
+            a.addField(binsonFloat(o))
+			
         default: 
             panic(fmt.Sprintf("%T is not handeled by Binson", o))
     }

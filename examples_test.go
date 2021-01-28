@@ -12,17 +12,17 @@ func ExampleNewBinson() {
     // Output: 4041
 }
 
-func ExampleNewPutInt() {
+func ExamplePut_Int() {
     b := binson.NewBinson().
         Put("cid", 4)
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 401403636964100441
 }
 
-func ExamplePutBinson() {
+func ExamplePut_Binson() {
     b := binson.NewBinson().
-        PutBinson("a", binson.NewBinson().
-            PutInt("b", 2))
+        Put("a", binson.NewBinson().
+            Put("b", 2))
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 401401614014016210024141
 }
@@ -39,14 +39,14 @@ func ExamplePut_Nested() {
 
 func ExampleNewBinsonArray() {
     b := binson.NewBinson().
-        PutArray("a", binson.NewBinsonArray().
-            PutInt(1).
-            PutString("hello"))
+        Put("a", binson.NewBinsonArray().
+            Put(1).
+            Put("hello"))
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 40140161421001140568656C6C6F4341
 }
 
-func ExamplePutArray() {
+func ExamplePut_Array() {
     b := binson.NewBinson().
         Put("a", 1).
         Put("b", binson.NewBinsonArray().
@@ -57,7 +57,7 @@ func ExamplePutArray() {
     // Output: 40140161100114016242100A101443140163100341
 }
 
-func ExamplePutArray_Nested() {
+func ExamplePut_Array_Nested() {
     b := binson.NewBinson().
         Put("a", 1).
         Put("b", binson.NewBinsonArray().
@@ -89,16 +89,16 @@ func ExampleToBytes() {
     // Output: 4014046161616111FA0041
 }
 
-func ExamplePutString() {
+func ExamplePut_String() {
     b := binson.NewBinson().
-        PutString("aaaa", "bbb")
+        Put("aaaa", "bbb")
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 40140461616161140362626241
 }
 
-func ExamplePutBytes() {
+func ExamplePut_Bytes() {
     b := binson.NewBinson().
-        PutBytes("aa", []byte{5, 5, 5})
+        Put("aa", []byte{5, 5, 5})
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 4014026161180305050541
 }
