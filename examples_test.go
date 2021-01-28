@@ -12,14 +12,14 @@ func ExampleNewBinson() {
     // Output: 4041
 }
 
-func ExamplePut_Int() {
+func ExampleBinson_Put_int() {
     b := binson.NewBinson().
         Put("cid", 4)
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 401403636964100441
 }
 
-func ExamplePut_Binson() {
+func ExampleBinson_Put_binson() {
     b := binson.NewBinson().
         Put("a", binson.NewBinson().
             Put("b", 2))
@@ -27,7 +27,7 @@ func ExamplePut_Binson() {
     // Output: 401401614014016210024141
 }
 
-func ExamplePut_Nested() {
+func ExampleBinson_Put_nested() {
     b := binson.NewBinson().
         Put("a", 1).
         Put("b", binson.NewBinson().
@@ -46,7 +46,7 @@ func ExampleNewBinsonArray() {
     // Output: 40140161421001140568656C6C6F4341
 }
 
-func ExamplePut_Array() {
+func ExampleBinsonArray_Put() {
     b := binson.NewBinson().
         Put("a", 1).
         Put("b", binson.NewBinsonArray().
@@ -57,7 +57,7 @@ func ExamplePut_Array() {
     // Output: 40140161100114016242100A101443140163100341
 }
 
-func ExamplePut_Array_Nested() {
+func ExampleBinsonArray_Put_nested() {
     b := binson.NewBinson().
         Put("a", 1).
         Put("b", binson.NewBinsonArray().
@@ -71,7 +71,7 @@ func ExamplePut_Array_Nested() {
     // Output: 40140161100114016242100A421064106543101443140163100341
 }
 
-func ExamplePut() {
+func ExampleBinson_Put() {
     b := binson.NewBinson().
         Put("a", 1).
         Put("b", -1).
@@ -82,21 +82,21 @@ func ExamplePut() {
     // Output: 40140161100114016210FF14016311FA0014016412FFFFFF7F14016613FFFFFFFFFFFFFF7F41
 }
 
-func ExampleToBytes() {
+func ExampleBinson_ToBytes() {
     b := binson.NewBinson().
         Put("aaaa", 250)
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 4014046161616111FA0041
 }
 
-func ExamplePut_String() {
+func ExampleBinson_Put_string() {
     b := binson.NewBinson().
         Put("aaaa", "bbb")
     fmt.Printf("%X\n", b.ToBytes())
     // Output: 40140461616161140362626241
 }
 
-func ExamplePut_Bytes() {
+func ExampleBinson_Put_bytes() {
     b := binson.NewBinson().
         Put("aa", []byte{5, 5, 5})
     fmt.Printf("%X\n", b.ToBytes())
